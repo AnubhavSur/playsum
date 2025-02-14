@@ -4,26 +4,32 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PlaySum</title>
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
-  <!-- Bootstrap CSS for layout and styling -->
+  <!-- Google Fonts: Montserrat and Roboto -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Roboto:wght@300&display=swap" rel="stylesheet">
+  <!-- Bootstrap CSS for layout -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
   <!-- FontAwesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <style>
     /* Global Styling */
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: 'Montserrat', sans-serif;
       margin: 0;
       padding: 0;
       transition: background-color 0.3s, color 0.3s;
+      background: linear-gradient(135deg, #2C3E50, #4CA1AF);
+      color: #f0f0f0;
+      overflow-x: hidden;
     }
     body.dark-mode {
-      background-color: #121212;
-      color: #e0e0e0;
+      background: linear-gradient(135deg, #1d1f21, #27292c);
+      color: #f0f0f0;
     }
     body.light-mode {
-      background-color: #f8f9fa;
+      background: #f0f0f0;
       color: #333;
     }
     /* Header */
@@ -31,80 +37,120 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 15px 30px;
-      background: #1db954;
+      padding: 20px 40px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
       color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
     .header h2 {
       margin: 0;
-      font-weight: 600;
+      font-size: 1.8rem;
+      letter-spacing: 1px;
     }
     .header button {
-      border: 1px solid #fff;
+      border: 2px solid #fff;
+      border-radius: 50px;
+      padding: 8px 16px;
+      background: transparent;
+      transition: background 0.3s, color 0.3s;
+    }
+    .header button:hover {
+      background: #fff;
+      color: #333;
+    }
+    /* Remove focus outline on buttons */
+    button:focus, .btn:focus, input:focus, select:focus, textarea:focus {
+      outline: none !important;
+      box-shadow: none !important;
     }
     /* Layout */
     .playlist {
-      max-height: 90vh;
+      max-height: calc(100vh - 80px);
       overflow-y: auto;
-      border-right: 1px solid rgba(0,0,0,0.1);
-      padding: 15px;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(5px);
     }
     .playlist-item {
-      padding: 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background: rgba(255,255,255,0.1);
+      transition: background 0.3s, transform 0.2s;
       cursor: pointer;
-      transition: background 0.2s;
     }
     .playlist-item:hover {
-      background: rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.2);
+      transform: translateX(5px);
     }
     .playlist-item.active {
-      background: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.3);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .playlist-item strong {
+      font-size: 1rem;
+    }
+    .playlist-item small {
+      font-size: 0.8rem;
     }
     /* Player Panel */
     .player-panel {
-      padding: 20px;
+      padding: 40px;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: calc(100vh - 80px);
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
     }
     .cover {
-      width: 300px;
-      height: 300px;
+      width: 320px;
+      height: 320px;
       background-size: cover;
       background-position: center;
-      margin: 0 auto;
-      border-radius: 10px;
+      border-radius: 15px;
       position: relative;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      margin-bottom: 20px;
+      transition: transform 0.3s;
+    }
+    .cover:hover {
+      transform: scale(1.05);
     }
     /* Loading Spinner Overlay */
     .spinner-overlay {
       position: absolute;
       top: 0;
       left: 0;
-      width: 300px;
-      height: 300px;
+      width: 100%;
+      height: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
       background: rgba(0,0,0,0.5);
-      border-radius: 10px;
+      border-radius: 15px;
       display: none;
     }
-    .player-info {
-      margin-top: 20px;
-    }
     .player-info h3 {
-      margin-bottom: 5px;
+      margin: 10px 0 5px;
+      font-size: 1.5rem;
     }
     .player-info p {
-      margin-top: 0;
+      margin: 0;
       opacity: 0.8;
+      font-size: 1rem;
     }
     /* Player Controls */
     .player-controls {
-      margin-top: 20px;
+      margin-top: 30px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -113,45 +159,92 @@
       background: none;
       border: none;
       color: inherit;
-      font-size: 30px;
-      margin: 0 20px;
+      font-size: 2rem;
+      margin: 0 30px;
       cursor: pointer;
-      outline: none;
+      transition: transform 0.2s;
+    }
+    .player-controls button:hover {
+      transform: scale(1.2);
     }
     /* Progress Bar */
     .progress-container {
       width: 80%;
+      max-width: 600px;
       margin: 20px auto;
       cursor: pointer;
       position: relative;
-      height: 10px;
+      height: 12px;
       background: rgba(255,255,255,0.2);
-      border-radius: 5px;
+      border-radius: 6px;
+      overflow: hidden;
     }
     .progress {
       height: 100%;
       width: 0;
       background: #1db954;
-      border-radius: 5px;
+      border-radius: 6px;
+      transition: width 0.1s linear;
     }
     /* Favorite Button */
     #favoriteBtn {
       border-radius: 50%;
       width: 50px;
       height: 50px;
-      font-size: 22px;
+      font-size: 1.5rem;
       margin-top: 15px;
       border: none;
       background: transparent;
-      color: inherit;
-      outline: none;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    #favoriteBtn:hover {
+      transform: scale(1.2);
+    }
+    /* Aesthetic Neon Green Scrollbar */
+    ::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #39FF14;
+      border-radius: 10px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #32e019;
+    }
+    html {
+      scrollbar-width: thin;
+      scrollbar-color: #39FF14 rgba(0, 0, 0, 0.2);
+    }
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      .header {
+        padding: 15px 20px;
+      }
+      .playlist {
+        padding: 15px;
+      }
+      .player-panel {
+        padding: 20px;
+      }
+      .cover {
+        width: 260px;
+        height: 260px;
+      }
     }
   </style>
 </head>
 <body class="dark-mode">
   <!-- Header -->
   <div class="header">
-    <h2>PlaySum - Made by Anubhav</h2>
+    <h2>PlaySum - Made by Anubhav </h2>
     <div>
       <button id="toggleMode" class="btn btn-outline-light">Light Mode</button>
     </div>
@@ -161,11 +254,13 @@
   <div class="container-fluid">
     <div class="row no-gutters">
       <!-- Playlist Column -->
-      <div class="col-md-3 playlist" id="playlist">
+      <!-- On mobile: order-2 (appears second), on md+ screens: order-md-1 (first) -->
+      <div class="col-md-3 playlist order-2 order-md-1" id="playlist">
         <!-- Playlist items will be injected here -->
       </div>
       <!-- Player Column -->
-      <div class="col-md-9">
+      <!-- On mobile: order-1 (appears first), on md+ screens: order-md-2 (second) -->
+      <div class="col-md-9 order-1 order-md-2">
         <div class="player-panel">
           <div class="cover" id="cover">
             <div class="spinner-overlay" id="spinner">
@@ -194,6 +289,8 @@
     </div>
   </div>
 
+  <!-- Include the tracks array from an external file -->
+  <script src="tracks.js"></script>
   <!-- jQuery library -->
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   <!-- Bootstrap JS bundle -->
@@ -201,31 +298,7 @@
   <!-- Howler.js for audio playback -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
   <script>
-    /* --- Track Data --- */
-    const tracks = [
-      {
-        trackName: 'Oh Okay',
-        artist: 'Gunna',
-        src: 'song1.mp3',
-        cover: 'https://image-cdn.hypb.st/https%3A%2F%2Fhypebeast.com%2Fimage%2F2024%2F04%2F15%2Fgunna-one-of-wun-album-announcement-cover-art-0.jpg?w=960&cbr=1&q=90&fit=max',
-        isFavorite: false
-      },
-      {
-        trackName: 'Dumb, Dumber and Dumber',
-        artist: 'Lil Baby',
-        src: 'song2.mp3',
-        cover: 'https://www.nme.com/wp-content/uploads/2021/01/nme-big-read-2021-lil-baby-cover@1990x2488.jpg',
-        isFavorite: false
-      },
-      {
-        trackName: 'Hold Me Up',
-        artist: 'Young Thug',
-        src: 'song3.mp3',
-        cover: 'https://static.wikia.nocookie.net/totalwar-ar/images/a/ac/Young_Thug.jpg/revision/latest/scale-to-width-down/450?cb=20210611170218',
-        isFavorite: false
-      }
-    ];
-
+    /* --- Variables & State --- */
     let currentTrackIndex = 0;
     let isPlaying = false;
     let sound; // Howler.js sound instance
